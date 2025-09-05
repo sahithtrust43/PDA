@@ -1,20 +1,28 @@
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import heroImage from "@/assets/hero-image.jpg";
-import { ChevronRight, Scale, Shield, Clock, FileCheck, Gavel } from "lucide-react";
+// Import necessary components and libraries.
+import { Button } from "@/components/ui/button"; // Button component.
+import { useNavigate } from "react-router-dom"; // Hook for navigation.
+import heroImage from "@/assets/hero-image.jpg"; // Hero image.
+import { ChevronRight, Scale, Shield, Clock, FileCheck, Gavel } from "lucide-react"; // Icons.
 
+// The Hero component represents the main banner section of the landing page.
 const Hero = () => {
+  // useNavigate hook for programmatic navigation.
   const navigate = useNavigate();
   
+  // Handles the click event for the "Get Started" button.
   const handleGetStarted = () => {
+    // Navigates to the authentication page.
     navigate("/auth");
   };
 
+  // Handles the click event for the "Learn More" button.
   const handleLearnMore = () => {
+    // Scrolls to the features section.
     document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
+    // The main section of the hero component.
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Modern geometric background */}
       <div className="absolute inset-0 bg-gradient-subtle" />
@@ -41,6 +49,7 @@ const Hero = () => {
         <FileCheck className="absolute top-60 left-20 w-20 h-20 text-primary/5 rotate-45 animate-float" style={{ animationDelay: '4s' }} />
       </div>
       
+      {/* Main content container */}
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           <div className="animate-fade-in">
@@ -50,6 +59,7 @@ const Hero = () => {
               <span className="text-sm text-foreground">Legal Document Intelligence</span>
             </div>
             
+            {/* Main heading */}
             <h1 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 Property
@@ -62,11 +72,13 @@ const Hero = () => {
               </span>
             </h1>
             
+            {/* Subheading */}
             <p className="text-lg md:text-xl text-muted-foreground mb-12 leading-relaxed max-w-3xl mx-auto">
               Streamline legal document review with AI precision. Analyze contracts, identify risks, 
               and ensure compliance with the power of modern legal technology.
             </p>
             
+            {/* Call-to-action buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Button 
                 variant="hero" 
@@ -113,4 +125,5 @@ const Hero = () => {
   );
 };
 
+// Export the Hero component.
 export default Hero;

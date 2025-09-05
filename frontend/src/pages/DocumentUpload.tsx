@@ -1,29 +1,39 @@
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Scale } from "lucide-react";
+// Import necessary components and libraries.
+import { useState, useRef } from "react"; // Hooks for managing state and refs.
+import { Button } from "@/components/ui/button"; // Button component.
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Card components.
+import { useToast } from "@/hooks/use-toast"; // Hook for displaying toasts.
+import { Upload, FileText, Scale } from "lucide-react"; // Icons.
 
+// The DocumentUpload component handles the file upload functionality.
 const DocumentUpload = () => {
+  // State to track if a file is being dragged over the drop zone.
   const [isDragging, setIsDragging] = useState(false);
+  // State to store the list of uploaded files.
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  // Ref for the file input element.
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // useToast hook for displaying notifications.
   const { toast } = useToast();
 
+  // Handles the drag enter event.
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
+  // Handles the drag leave event.
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
+  // Handles the drag over event.
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
+  // Handles the drop event.
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -32,12 +42,15 @@ const DocumentUpload = () => {
     handleFiles(files);
   };
 
+  // Handles the file selection from the file input.
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     handleFiles(files);
   };
 
+  // Processes the selected or dropped files.
   const handleFiles = (files: File[]) => {
+    // Filter for valid file types.
     const validFiles = files.filter(file => 
       file.type === 'application/pdf' || 
       file.type.startsWith('image/') ||
@@ -45,6 +58,7 @@ const DocumentUpload = () => {
       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     );
 
+    // Show a toast if any files were rejected.
     if (validFiles.length !== files.length) {
       toast({
         title: "Some files were rejected",
@@ -53,8 +67,10 @@ const DocumentUpload = () => {
       });
     }
 
+    // Add the valid files to the state.
     setUploadedFiles(prev => [...prev, ...validFiles]);
     
+    // Show a success toast if any files were uploaded.
     if (validFiles.length > 0) {
       toast({
         title: "Documents uploaded!",
@@ -63,10 +79,12 @@ const DocumentUpload = () => {
     }
   };
 
+  // Removes a file from the uploaded files list.
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Simulates the document analysis process.
   const analyzeDocuments = () => {
     if (uploadedFiles.length === 0) {
       toast({
@@ -84,6 +102,7 @@ const DocumentUpload = () => {
   };
 
   return (
+    // Main container for the document upload page.
     <div className="min-h-screen bg-gradient-subtle p-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
@@ -105,6 +124,7 @@ const DocumentUpload = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Drop zone for file uploads. */}
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
                 isDragging 
@@ -139,6 +159,7 @@ const DocumentUpload = () => {
           </CardContent>
         </Card>
 
+        {/* Display the list of uploaded files. */}
         {uploadedFiles.length > 0 && (
           <Card className="mb-8">
             <CardHeader>
@@ -188,4 +209,5 @@ const DocumentUpload = () => {
   );
 };
 
+// Export the DocumentUpload component.
 export default DocumentUpload;

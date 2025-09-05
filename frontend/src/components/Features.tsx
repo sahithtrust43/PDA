@@ -1,6 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Scale, Shield, Clock, ArrowRight, Sparkles, Gavel, FileCheck } from "lucide-react";
+// Import necessary components and libraries.
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Card components.
+import { FileText, Scale, Shield, Clock, ArrowRight, Sparkles, Gavel, FileCheck } from "lucide-react"; // Icons.
 
+// Array of features to be displayed.
 const features = [
   {
     icon: <FileText className="w-8 h-8" />,
@@ -28,8 +30,10 @@ const features = [
   }
 ];
 
+// The Features component displays the key features of the application.
 const Features = () => {
   return (
+    // The main section for the features.
     <section id="features" className="py-32 relative">
       {/* Legal background elements */}
       <div className="absolute inset-0">
@@ -46,6 +50,7 @@ const Features = () => {
         />
       </div>
       
+      {/* Main content container */}
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-24 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-sm mb-8">
@@ -53,16 +58,19 @@ const Features = () => {
             <span className="text-sm text-foreground">Legal Technology</span>
           </div>
           
+          {/* Section heading */}
           <h2 className="text-5xl md:text-6xl font-bold mb-8 tracking-tight">
             <span className="text-foreground">Legal</span>{" "}
             <span className="bg-gradient-primary bg-clip-text text-transparent">Intelligence</span>
           </h2>
           
+          {/* Section subheading */}
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Professional legal document analysis tools
           </p>
         </div>
 
+        {/* Grid of features */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {features.map((feature, index) => (
             <Card 
@@ -120,4 +128,5 @@ const Features = () => {
   );
 };
 
+// Export the Features component.
 export default Features;
