@@ -1,39 +1,31 @@
-// Import necessary components and libraries.
-import { useState, useRef } from "react"; // Hooks for managing state and refs.
-import { Button } from "@/components/ui/button"; // Button component.
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"; // Card components.
-import { useToast } from "@/hooks/use-toast"; // Hook for displaying toasts.
-import { Upload, FileText, Scale } from "lucide-react"; // Icons.
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { Upload, FileText, Scale, CheckCircle2, X } from "lucide-react";
 
-// The DocumentUpload component handles the file upload functionality.
 const DocumentUpload = () => {
-  // State to track if a file is being dragged over the drop zone.
   const [isDragging, setIsDragging] = useState(false);
-  // State to store the list of uploaded files.
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  // Ref for the file input element.
+  const [justUploaded, setJustUploaded] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // useToast hook for displaying notifications.
   const { toast } = useToast();
 
-  // Handles the drag enter event.
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  // Handles the drag leave event.
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
-  // Handles the drag over event.
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  // Handles the drop event.
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -42,15 +34,12 @@ const DocumentUpload = () => {
     handleFiles(files);
   };
 
-  // Handles the file selection from the file input.
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     handleFiles(files);
   };
 
-  // Processes the selected or dropped files.
   const handleFiles = (files: File[]) => {
-    // Filter for valid file types.
     const validFiles = files.filter(file => 
       file.type === 'application/pdf' || 
       file.type.startsWith('image/') ||
@@ -58,7 +47,6 @@ const DocumentUpload = () => {
       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     );
 
-    // Show a toast if any files were rejected.
     if (validFiles.length !== files.length) {
       toast({
         title: "Some files were rejected",
@@ -67,10 +55,18 @@ const DocumentUpload = () => {
       });
     }
 
-    // Add the valid files to the state.
+    const startIndex = uploadedFiles.length;
     setUploadedFiles(prev => [...prev, ...validFiles]);
     
-    // Show a success toast if any files were uploaded.
+    // Mark new files as just uploaded for animation
+    const newFileIndices = validFiles.map((_, i) => startIndex + i);
+    setJustUploaded(newFileIndices);
+    
+    // Remove animation after 2 seconds
+    setTimeout(() => {
+      setJustUploaded([]);
+    }, 2000);
+    
     if (validFiles.length > 0) {
       toast({
         title: "Documents uploaded!",
@@ -79,12 +75,11 @@ const DocumentUpload = () => {
     }
   };
 
-  // Removes a file from the uploaded files list.
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setJustUploaded(prev => prev.filter(i => i !== index).map(i => i > index ? i - 1 : i));
   };
 
-  // Simulates the document analysis process.
   const analyzeDocuments = () => {
     if (uploadedFiles.length === 0) {
       toast({
@@ -102,7 +97,6 @@ const DocumentUpload = () => {
   };
 
   return (
-    // Main container for the document upload page.
     <div className="min-h-screen bg-gradient-subtle p-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
@@ -124,7 +118,6 @@ const DocumentUpload = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Drop zone for file uploads. */}
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
                 isDragging 
@@ -159,32 +152,58 @@ const DocumentUpload = () => {
           </CardContent>
         </Card>
 
-        {/* Display the list of uploaded files. */}
         {uploadedFiles.length > 0 && (
-          <Card className="mb-8">
+          <Card className="mb-8 border-primary/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Uploaded Documents ({uploadedFiles.length})
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  Uploaded Documents
+                </div>
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  {uploadedFiles.length} {uploadedFiles.length === 1 ? 'file' : 'files'}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {uploadedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div 
+                    key={index} 
+                    className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-500 ${
+                      justUploaded.includes(index) 
+                        ? 'bg-primary/5 border-primary/30 animate-pulse' 
+                        : 'bg-muted/50 border-border hover:bg-muted'
+                    }`}
+                  >
                     <div className="flex items-center gap-3">
-                      <FileText className="h-4 w-4 text-primary" />
-                      <span className="font-medium">{file.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                      </span>
+                      <div className="relative">
+                        <FileText className="h-5 w-5 text-primary" />
+                        {justUploaded.includes(index) && (
+                          <CheckCircle2 className="h-3 w-3 text-primary absolute -top-1 -right-1 animate-bounce" />
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">{file.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                          {justUploaded.includes(index) && (
+                            <Badge variant="secondary" className="text-xs bg-primary/20 text-primary">
+                              Just uploaded
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeFile(index)}
+                      className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
                     >
-                      Remove
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
@@ -209,5 +228,4 @@ const DocumentUpload = () => {
   );
 };
 
-// Export the DocumentUpload component.
 export default DocumentUpload;
